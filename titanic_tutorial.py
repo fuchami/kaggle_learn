@@ -49,11 +49,8 @@ kesson_table(train)
 
 # %%
 # 文字列データを数字に変換
-train["Sex"][train["Sex"] == "male"] = 0
-train["Sex"][train["Sex"] == "female"] = 1
-train["Embarked"][train["Embarked"] == "S"] = 0
-train["Embarked"][train["Embarked"] == "C"] = 1
-train["Embarked"][train["Embarked"] == "Q"] = 2
+train["Sex"] = train["Sex"].map({"male": 0, "female": 1})
+train["Embarked"] = train["Embarked"].map({"S":0, "C":1, "Q":2})
 
 train.head(10)
 
@@ -100,4 +97,25 @@ PassengerID = np.array(test["PassengerId"]).astype(int)
 my_solution = pd.DataFrame(my_prediction, PassengerID, columns=["Survived"])
 
 # my_tree_one.csvとして書き出し
-my_solution.to_csv("my_tree_one.csv", index_label=["PassengerId"])
+# my_solution.to_csv("my_tree_one.csv", index_label=["PassengerId"])
+
+# %%
+# 説明変数を追加してやってみる
+features_two = train[["Pclass", "Age","Sex", "Fare", "SibSp", "Parch", "Embarked"]].values
+
+# 決定木の作成とアーギュメントの設定
+max_depth = 10
+min_samples_split = 5
+my_tree_two = tree.DecisionTreeClassifier(max_depth=max_depth, min_samples_split=min_samples_split, random_state=1)
+my_tree_two = my_tree_two.fit(features_two, target)
+
+# testから「その2」で使う項目の値を取り出す
+test_feature_2 = test[["Pclass", "Age", "Sex", "Fare", "SibSp", "Parch", "Embarked"]].values
+
+# 「その2」の決定木を使って予測をしてCSVへ書き出し
+my_prediction_tree_two = my_tree_two.predict(test_feature_2)
+PassengerID = np.array(test["PassengerId"]).astype(int)
+
+# 予測データとPassengerIDをデータフレームへ落とし込む
+my_solution_tree_two = pd.DataFrame(my_prediction_tree_two, PassengerID, columns=["Survived"])
+my_solution_tree_two.to_csv("my_tree_two.csv", index_label=["PassengerId"])
