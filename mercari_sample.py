@@ -24,7 +24,7 @@ test.head()
 # trainとtestのサイズを確認
 train.shape, test.shape
 
-# %% データの統計量を確認
+#%% データの統計量を確認
 def display_all(df):
     with pd.option_context("display.max_rows", 1000):
         with pd.option_context("display.max_columns", 1000):
@@ -33,7 +33,7 @@ def display_all(df):
 # trainの基本統計を表示
 display_all(train.describe(include='all').transpose())
 
-# %% trainのカテゴリ名、商品説明、投稿タイトル、ブランド名のデータタイプを「category」へ変換する
+#%% trainのカテゴリ名、商品説明、投稿タイトル、ブランド名のデータタイプを「category」へ変換する
 train.category_name = train.category_name.astype('category')
 train.item_description = train.item_description.astype('category')
 train.name = train.name.astype('category')
@@ -47,3 +47,19 @@ test.brand_name = test.brand_name.astype('category')
 
 # dtypesでデータ形式を確認
 train.dtypes, test.dtypes
+
+#%% train,testの中のユニークな値を確認する
+train.apply(lambda x: x.nunique())
+test.apply(lambda x: x.nunique())
+
+#%% train,testの欠損データの個数と%を確認
+train.isnull().sum(),train.isnull().sum()/train.shape[0]
+test.isnull().sum(),test.isnull().sum()/test.shape[0]
+
+''' データ事前処理
+1. trainとtestのデータを連結させる
+2． 連結させたDataFrameの文字列のデータ形式を「category」へ変換
+3. 文字列を数値へ値を変換
+4. 訓練用のデータを「price」をnp.log()で処理
+5. ランダムフォレスト用にxとyで分ける
+'''
